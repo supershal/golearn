@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"strconv"
 )
 
 type node struct {
@@ -33,12 +35,15 @@ func reverse(head *node) *node {
 	return prev
 }
 
-func print(root *node) {
+func print(root *node) string {
+	var r bytes.Buffer
 	for root != nil {
-		fmt.Printf("%d->", root.value)
+		r.WriteString(strconv.Itoa(root.value))
+		r.WriteString("->")
 		root = root.next
 	}
-	fmt.Println("")
+	r.WriteString("nil")
+	return r.String()
 }
 
 func middle(root *node) *node {
@@ -143,7 +148,7 @@ func sortedMerge(head *node, rest *node) *node {
 		merged = head
 		merged.next = rest
 		merged = merged.next
-		merged = sortedMerge(head.next, rest.next)
+		merged.next = sortedMerge(head.next, rest.next)
 	}
 	return merged
 }
@@ -162,7 +167,56 @@ func pairwiseSwap(head *node) *node {
 	return current
 }
 
+func isPalindrome(head *node) bool {
+	if head == nil {
+		return true
+	}
+	stack := make([]int, 0)
+	curr, fast := head, head
+	for fast != nil && fast.next != nil {
+		stack = append(stack, curr.value)
+		curr = curr.next
+		fast = fast.next.next
+	}
+	// 1, 2, 1 -> stack (1), slow = 2, fast = 1
+	// 1,2,2,1 -> stack 1,2   slow=2' fast=nil
+	// so in case 1: if we want to compare 1 with 1 then when fast != nil then advance current pointer
+	if fast != nil {
+		curr = curr.next
+	}
+
+	for curr != nil {
+		pop := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if pop != curr.value {
+			return false
+		}
+		curr = curr.next
+	}
+	return true
+}
+
+func TestPalindrome() {
+	cases := []struct {
+		in  *node
+		out bool
+	}{
+		{nil, true},
+		{newNode(1, nil), true},
+		{newNode(1, newNode(2, newNode(1, nil))), true},
+		{newNode(1, newNode(2, newNode(2, newNode(1, nil)))), true},
+		{newNode(1, newNode(2, newNode(2, newNode(3, nil)))), false},
+		{newNode(1, newNode(2, newNode(3, newNode(3, nil)))), false},
+	}
+
+	for _, c := range cases {
+		fmt.Println("palindrom of :", print(c.in), "Expected:", c.out, "Result:", isPalindrome(c.in))
+	}
+}
+
 func main() {
+	TestPalindrome()
+
 	root := newNode(1, newNode(2, newNode(3, newNode(4, newNode(5, nil)))))
 	fmt.Println("reverse")
 	print(reverse(root))
