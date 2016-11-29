@@ -145,10 +145,26 @@ func TestMergeTwoSortedArray() {
 	fmt.Println("Result=", C)
 }
 
+func fibo(n int) int {
+	if n == 0 {
+		return 0
+	}
+	if n == 1 {
+		return 1
+	}
+	return fibo(n-1) + fibo(n-2)
+}
+
+func TestFibo() {
+	fmt.Println("6th fibo. expected: 8, got:", fibo(6))
+	fmt.Println("10th fibo. expected: 55, got:", fibo(10))
+}
+
 func main() {
 	//TestModulo()
 	//TestFizzbuzz()
 	//TestSmallestChange()
 	//TestSumOnes()
+	TestFibo()
 	TestMergeTwoSortedArray()
 }
