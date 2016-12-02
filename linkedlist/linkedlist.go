@@ -238,13 +238,15 @@ func recNthNode(head *node, n int) int {
 	if head == nil {
 		return 0
 	}
-	var i int = recNthNode(head.next, n) + 1
+	i := recNthNode(head.next, n) + 1
 	if i == n {
 		fmt.Printf("nth node recursive: %v\n", head)
 	}
 	return i
 }
 
+//first solve using Visited Map method.
+// then optimize it if asked.
 func detectLoop(head *node) bool {
 	if head == nil {
 		return false

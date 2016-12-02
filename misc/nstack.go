@@ -110,7 +110,3 @@ func TestNStack() {
 	fmt.Println("pop(2) should be 9. result: ", nStack.pop(2)) //5
 
 }
-
-func main() {
-	TestNStack()
-}

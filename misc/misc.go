@@ -145,10 +145,45 @@ func TestMergeTwoSortedArray() {
 	fmt.Println("Result=", C)
 }
 
+// Write function to find permutation of string
+// permutation: n! .
+// if dupliactes then permutations are n!/(a! * b! *...) where a , b are number of duplicates
+// {a} => {a}
+// {ab} => {ab,ba}
+//{abc} =>{ abc, acb, bac, bca, cab, cba}
+// logic: taken one char and append permutation of rest of chars to it. and then iterate through it.
+// abc
+//  /
+// a, bc
+//   /   \
+// ab, c  ac, b
+//     /      \
+//    abc, nil acb, nil
+func stringPermutation(s string) []string {
+	result := make([]string, 0)
+	permutation("", s, &result)
+	return result
+}
+
+func permutation(prefix, suffix string, results *[]string) {
+	if len(suffix) == 0 {
+		*results = append(*results, prefix)
+	}
+	for i := 0; i < len(suffix); i++ {
+		permutation(prefix+string(suffix[i]), suffix[:i]+suffix[i+1:], results)
+	}
+}
+
+func TestPermuatation() {
+	fmt.Println("permuatation of abc", stringPermutation("abc"))
+}
+
 func main() {
 	//TestModulo()
 	//TestFizzbuzz()
 	//TestSmallestChange()
 	//TestSumOnes()
-	TestMergeTwoSortedArray()
+	//TestMergeTwoSortedArray()
+	//TestNStack()
+	TestPermuatation()
 }
