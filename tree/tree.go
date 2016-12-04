@@ -199,9 +199,150 @@ func TestBalanced() {
 	fmt.Println("balanced: expect false", isBalanced(root))
 }
 
+func sumOfLeftLeaves(root *node, left bool) int {
+	if root == nil {
+		return 0
+	}
+	if root.left == nil && root.right == nil && left {
+		return root.value
+	}
+	var sumLeft = 0
+	sumLeft += sumOfLeftLeaves(root.left, true) + sumOfLeftLeaves(root.right, false)
+	return sumLeft
+}
+
+func TestSumOfLeftLeaves() {
+	tree := []int{4, 2, 6, 1, 3, 5, 7} // level order
+	var root *node
+	for i := 0; i < len(tree); i++ {
+		root = insert(tree[i], root)
+	}
+	fmt.Println("SumOfLeftLeaves: expected: 6, got:", sumOfLeftLeaves(root, false))
+}
+
+//Given a binary tree, return all root-to-leaf paths.
+func rootToLeafPath(root *node, currPath string, paths *[]string) {
+	if root == nil {
+		return
+	}
+	if root.left == nil || root.right == nil {
+		*paths = append(*paths, currPath+strconv.Itoa(root.value))
+	}
+	currPath += strconv.Itoa(root.value) + "->"
+	rootToLeafPath(root.left, currPath, paths)
+	rootToLeafPath(root.right, currPath, paths)
+}
+
+func TestRootToLeafPath() {
+	tree := []int{4, 2, 6, 1, 3, 5, 7} // level order
+	var root *node
+	for i := 0; i < len(tree); i++ {
+		root = insert(tree[i], root)
+	}
+	paths := make([]string, 0)
+	rootToLeafPath(root, "", &paths)
+	fmt.Println("rootToLeafPath of:", printLevel(root), "paths:", paths)
+
+}
+
+//Given a binary tree and a sum, determine if the tree has a root-to-leaf path such that adding up all the values along the path equals the given sum.
+func rootToLeafSum(root *node, sum int) bool {
+	if root.left == nil && root.right == nil {
+		if (root.value - sum) == 0 {
+			return true
+		} else {
+			return false
+		}
+	}
+	return rootToLeafSum(root.left, sum-root.value) || rootToLeafSum(root.right, sum-root.value)
+}
+
+func TestRootToLeafSum() {
+	tree := []int{4, 2, 6, 1, 3, 5, 7} // level order
+	var root *node
+	for i := 0; i < len(tree); i++ {
+		root = insert(tree[i], root)
+	}
+	fmt.Println("rootToLeafPath of:", printLevel(root), ", sum = 15, expected: true, got:", rootToLeafSum(root, 15))
+	fmt.Println("rootToLeafPath of:", printLevel(root), ", sum = 25, expected: false, got:", rootToLeafSum(root, 25))
+
+}
+
+//Given a binary tree, find its minimum depth.
+//The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
+func minDepth(root *node, height int) int {
+	if root == nil {
+		return -1
+	}
+	if root.left == nil && root.right == nil {
+		return height
+	}
+
+	return min(minDepth(root.left, height+1), minDepth(root.right, height+1))
+}
+
+func minDepth2(root *node) int {
+	if root == nil {
+		return 0
+	}
+	l := minDepth2(root.left)
+	r := minDepth2(root.right)
+	if l == 0 || r == 0 { // tree with only one child.
+		return l + r + 1
+	}
+	return min(l, r) + 1
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// Bottom up level order traversal.
+// try to solve with three elements. then generalize it.
+func bottomUpLeftRightLevel(root *node) (stack []*node) {
+	if root == nil {
+		return stack
+	}
+	queue := make([]*node, 0)
+	queue = append(queue, root)
+	for len(queue) != 0 {
+		top := queue[0]
+		queue = queue[1:]
+		stack = append(stack, top)
+		if top.right != nil {
+			queue = append(queue, top.right)
+		}
+		if top.left != nil {
+			queue = append(queue, top.left)
+		}
+	}
+	return stack
+}
+
+func TestBottomUpLeftRightLevel() {
+	tree := []int{4, 2, 6, 1, 3, 5, 7} // level order
+	var root *node
+	for i := 0; i < len(tree); i++ {
+		root = insert(tree[i], root)
+	}
+	stack := bottomUpLeftRightLevel(root)
+	fmt.Println("Bottom up level order traversal of ", printLevel(root))
+	for i := len(stack) - 1; i >= 0; i-- {
+		fmt.Printf("%v->", stack[i].value)
+	}
+	fmt.Println("")
+}
+
 func main() {
 	TestLevelOrder()
 	//TestPrintLevel()
 	//TestLongestBranch()
 	TestBalanced()
+	TestSumOfLeftLeaves()
+	TestRootToLeafPath()
+	TestRootToLeafSum()
+	TestBottomUpLeftRightLevel()
 }
