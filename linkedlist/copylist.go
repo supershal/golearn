@@ -6,21 +6,21 @@ import (
 	"strconv"
 )
 
-type node struct {
+type cnode struct {
 	value  int
-	next   *node
-	random *node
+	next   *cnode
+	random *cnode
 }
 
-func newNode(v int, n, r *node) *node {
-	return &node{
+func newCNode(v int, n, r *cnode) *cnode {
+	return &cnode{
 		v,
 		n,
 		r,
 	}
 }
 
-func print(head *node) string {
+func cprint(head *cnode) string {
 	var r bytes.Buffer
 	for head != nil {
 		r.WriteString(strconv.Itoa(head.value))
@@ -35,13 +35,13 @@ func print(head *node) string {
 	return r.String()
 }
 
-func copyUsingMap(head *node) *node {
+func copyUsingMap(head *cnode) *cnode {
 	if head == nil {
 		return nil
 	}
-	cache := make(map[int]*node, 0)
+	cache := make(map[int]*cnode, 0)
 	current := head
-	copy := newNode(current.value, nil, nil)
+	copy := newCNode(current.value, nil, nil)
 	cache[current.value] = copy
 	prev := copy
 	for current != nil {
@@ -49,7 +49,7 @@ func copyUsingMap(head *node) *node {
 		if current == nil {
 			break
 		}
-		newN := newNode(current.value, nil, nil)
+		newN := newCNode(current.value, nil, nil)
 		cache[current.value] = newN
 		prev.next = newN
 		prev = newN
@@ -67,7 +67,7 @@ func copyUsingMap(head *node) *node {
 
 }
 
-func copyList(head *node) *node {
+func copyList(head *cnode) *cnode {
 	if head == nil {
 		return nil
 	}
@@ -75,7 +75,7 @@ func copyList(head *node) *node {
 	current := head
 
 	for current != nil {
-		newn := newNode(current.value, nil, nil)
+		newn := newCNode(current.value, nil, nil)
 		rest := current.next
 		current.next = newn
 		newn.next = rest
@@ -103,10 +103,10 @@ func copyList(head *node) *node {
 }
 
 func TestCopy() {
-	one := newNode(1, nil, nil)
-	two := newNode(2, nil, nil)
-	three := newNode(3, nil, nil)
-	four := newNode(4, nil, nil)
+	one := newCNode(1, nil, nil)
+	two := newCNode(2, nil, nil)
+	three := newCNode(3, nil, nil)
+	four := newCNode(4, nil, nil)
 
 	one.next, one.random = two, two
 	two.next, two.random = three, four
@@ -114,7 +114,7 @@ func TestCopy() {
 	four.next, four.random = nil, one
 
 	cases := []struct {
-		in, out *node
+		in, out *cnode
 	}{
 		{nil, nil},
 		{one, one},
@@ -123,18 +123,14 @@ func TestCopy() {
 	fmt.Println(">>>copy linked list using map<<<")
 	for _, c := range cases {
 		r := copyUsingMap(c.in)
-		fmt.Println("case:", print(c.in), "expceted:", print(c.out), "result:", print(r))
+		fmt.Println("case:", cprint(c.in), "expceted:", cprint(c.out), "result:", cprint(r))
 	}
 
 	fmt.Println(">>>copy linked list using pointer<<<")
 	for _, c := range cases {
-		fmt.Println("original in:", print(c.in), " original expected:", print(c.out))
+		fmt.Println("original in:", cprint(c.in), " original expected:", cprint(c.out))
 		r := copyList(c.in)
-		fmt.Println("case:", print(c.in), "expected:", print(c.out), "result:", print(r))
+		fmt.Println("case:", cprint(c.in), "expected:", cprint(c.out), "result:", cprint(r))
 	}
 
-}
-
-func main() {
-	TestCopy()
 }

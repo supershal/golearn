@@ -150,7 +150,7 @@ func sortedMerge(head *node, rest *node) *node {
 		merged = head
 		merged.next = rest
 		merged = merged.next
-		merged = sortedMerge(head.next, rest.next)
+		merged.next = sortedMerge(head.next, rest.next)
 	}
 	return merged
 }
@@ -167,6 +167,53 @@ func pairwiseSwap(head *node) *node {
 	current.next = head
 	head.next = pairwiseSwap(rest)
 	return current
+}
+
+func isPalindrome(head *node) bool {
+	if head == nil {
+		return true
+	}
+	stack := make([]int, 0)
+	curr, fast := head, head
+	for fast != nil && fast.next != nil {
+		stack = append(stack, curr.value)
+		curr = curr.next
+		fast = fast.next.next
+	}
+	// 1, 2, 1 -> stack (1), slow = 2, fast = 1
+	// 1,2,2,1 -> stack 1,2   slow=2' fast=nil
+	// so in case 1: if we want to compare 1 with 1 then when fast != nil then advance current pointer
+	if fast != nil {
+		curr = curr.next
+	}
+
+	for curr != nil {
+		pop := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if pop != curr.value {
+			return false
+		}
+		curr = curr.next
+	}
+	return true
+}
+
+func TestPalindrome() {
+	cases := []struct {
+		in  *node
+		out bool
+	}{
+		{nil, true},
+		{newNode(1, nil), true},
+		{newNode(1, newNode(2, newNode(1, nil))), true},
+		{newNode(1, newNode(2, newNode(2, newNode(1, nil)))), true},
+		{newNode(1, newNode(2, newNode(2, newNode(3, nil)))), false},
+		{newNode(1, newNode(2, newNode(3, newNode(3, nil)))), false},
+	}
+
+	for _, c := range cases {
+		fmt.Println("palindrom of :", print(c.in), "Expected:", c.out, "Result:", isPalindrome(c.in))
+	}
 }
 
 func nthNode(head *node, n int) *node {
@@ -191,13 +238,15 @@ func recNthNode(head *node, n int) int {
 	if head == nil {
 		return 0
 	}
-	var i int = recNthNode(head.next, n) + 1
+	i := recNthNode(head.next, n) + 1
 	if i == n {
 		fmt.Printf("nth node recursive: %v\n", head)
 	}
 	return i
 }
 
+//first solve using Visited Map method.
+// then optimize it if asked.
 func detectLoop(head *node) bool {
 	if head == nil {
 		return false
@@ -471,9 +520,7 @@ func main() {
 	//TestIntersectionOfSorted()
 	//TestReverseGroupofK()
 	TestDeleteNodeGreaterRight()
-}
-
-func main2() {
+	TestCopy()
 
 	// fmt.Println("detect start of loop")
 	// 1->2->4->5->6
