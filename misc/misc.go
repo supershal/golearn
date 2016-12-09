@@ -110,7 +110,7 @@ func MergeTwoSortedArray(A, B []int) []int {
 		}
 	}
 	aLast, bMax := len(A)-1, len(B)-1
-	fmt.Println(aMax, aLast, bMax)
+
 	for ; aMax >= 0 && bMax >= 0; aLast-- {
 		if A[aMax] > B[bMax] {
 			A[aLast] = A[aMax]
@@ -126,6 +126,7 @@ func MergeTwoSortedArray(A, B []int) []int {
 			bMax--
 		}
 	}
+	//important. if all elements of A are sorted out and b is left. then B's left elements would be less than A's
 	if aMax == 0 {
 		for bMax > 0 {
 			A[aLast] = B[bMax]

@@ -923,6 +923,50 @@ func TestSumOfRoottoLeafPaths() {
 	root := makeTestTree()
 	fmt.Println("sum of root to leaf paths of ", printLevel(root), "\n expected: 1799, got:", sumOfRoottoLeafPaths(root, 0))
 }
+
+// delete node in bst.
+// in the process we have to set its parent's pointer to nil. that means we have to return referece to the iterate node and assign as left or right.
+// so function should return value.
+// if leaf node, return nil.
+// if left is nil then right is the answer
+// if right is nil then left is answer
+// if both are nil then find in order succ and copy its value to root.
+// then delete the succ
+func deleteNodeBST(root *node, key int) *node {
+	if root == nil {
+		return nil
+	}
+	if root.value < key {
+		root.right = deleteNodeBST(root.right, key)
+	} else if root.value > key {
+		root.left = deleteNodeBST(root.left, key)
+	} else if root.value == key {
+		if root.left == nil {
+			return root.right
+		}
+		if root.right == nil {
+			return root.left
+		}
+		succ := root.right
+		for succ.left != nil {
+			succ = succ.left
+		}
+		root.value = succ.value
+		root.right = deleteNodeBST(root.right, root.value) // delete successor node.
+	}
+	return root
+}
+
+func TestDeleteBST() {
+	root := makeTestTree()
+	fmt.Println("Delete node from bst:", printLevel(root), "Delete 7")
+	deleteNodeBST(root, 7)
+	fmt.Println("result:\n", printLevel(root))
+	fmt.Println("delete 6")
+	deleteNodeBST(root, 6)
+	fmt.Println("result:\n", printLevel(root))
+
+}
 func main() {
 	TestLevelOrder()
 	//TestPrintLevel()
@@ -959,5 +1003,7 @@ func main() {
 	TestDeepestLeftLeafNode()
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 	TestSumOfRoottoLeafPaths()
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	TestDeleteBST()
 
 }

@@ -303,6 +303,9 @@ func detectLoopStart(head *node) *node {
 		}
 	}
 
+	// Important.
+	// now fast is at k distance.
+	// move len - k disance is equivalent of m distance from head.
 	slow = head
 	for fast != slow {
 		fast = fast.next
