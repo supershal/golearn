@@ -514,6 +514,32 @@ func TestBottomUpLeftRightLevel() {
 	fmt.Println("")
 }
 
+// Given a binary tree, check whether it is a mirror of itself (ie, symmetric around its center).
+
+// For example, this binary tree [1,2,2,3,4,4,3] is symmetric:
+
+//     1
+//    / \
+//   2   2
+//  / \ / \
+// 3  4 4  3
+
+func isSymetric(root *node) bool {
+	if root == nil {
+		return true
+	}
+	return isSym(root.left, root.right)
+}
+func isSym(left, right *node) bool {
+	if left == nil || right == nil {
+		return left == right
+	}
+	if left.value != right.value {
+		return false
+	}
+	return isSym(left.left, right.right) && isSym(left.right, right.left)
+}
+
 // LCA of binary tree
 // if root == nil then return nil
 // if root is one of the value return value
@@ -967,6 +993,7 @@ func TestDeleteBST() {
 	fmt.Println("result:\n", printLevel(root))
 
 }
+
 func main() {
 	TestLevelOrder()
 	//TestPrintLevel()
