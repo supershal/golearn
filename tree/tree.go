@@ -199,6 +199,7 @@ func TestLongestBranch() {
 		root = insert(tree[i], root)
 	}
 	root = newTreeNode(11, root, newTreeNode(33, nil, newTreeNode(44, newTreeNode(55, nil, nil), nil)))
+	fmt.Println(printLevel(root))
 	fmt.Println(" longest branch expected: 11->33->44->55 = 4 Actual:", longestBranch(root))
 }
 
@@ -953,7 +954,8 @@ func TestSumOfRoottoLeafPaths() {
 func main() {
 	TestLevelOrder()
 	//TestPrintLevel()
-	//TestLongestBranch()
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	TestLongestBranch()
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 	TestBalanced()
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
