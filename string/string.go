@@ -106,6 +106,7 @@ func TestRepeatedSubString() {
 	}
 }
 
+<<<<<<< 27a95d4fccd6ffe397684df8a8d40f7e699b320b
 func ransomNote(ransom, dict []byte) bool {
 	charMap := make(map[byte]int)
 	for _, b := range dict {
@@ -249,6 +250,27 @@ func TestValidIP() {
 	for _, c := range cases {
 		fmt.Println("Validate IP:", c.in, "expected:", c.out, "got:", validateIP(c.in))
 	}
+=======
+func romanToInt(s string) int {
+	charMap := map[byte]int{
+		'I': 1,
+		'V': 5,
+		'X': 10,
+		'L': 50,
+	}
+
+	chars := []byte(s)
+	last := len(chars) - 1
+	sum := charMap[chars[last]]
+	for i := last - 1; i >= 0; i-- {
+		if charMap[chars[i]] < charMap[chars[i+1]] {
+			sum += -charMap[chars[i]]
+		} else {
+			sum += charMap[chars[i]]
+		}
+	}
+	return sum
+>>>>>>> string program
 }
 
 func main() {

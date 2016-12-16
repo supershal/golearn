@@ -223,7 +223,7 @@ func nthNode(head *node, n int) *node {
 	current := head
 	for current != nil && n > 0 {
 		current = current.next
-		n = n - 1
+		n--
 	}
 
 	rest := head
