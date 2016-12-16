@@ -25,12 +25,6 @@ func makeTestTree() *node {
 	}
 	return root
 }
-func printTree(root *node) string {
-	if root == nil {
-		return ""
-	}
-	return ""
-}
 
 func levelOrder(root *node) string {
 	if root == nil {
@@ -995,6 +989,416 @@ func TestDeleteBST() {
 
 }
 
+//   5
+//  / \
+//  3  7
+// / \ /
+// 2 4 6
+
+// 3 and 4
+// 5->3->4
+// 5->3
+
+//4 and 6
+// 5->3->4
+// 5->7->6
+
+// 7 and 6
+// 5->7->6
+// 5->7
+
+// 2 and 4
+// 5->3->2
+// 5->3->4
+
+// find path to the node
+// find lca by comparing element by element
+// skip both list until the lca is found
+// then join both lists.
+
+func pathBetweenNodesBST(root *node, x, y int) []int {
+	path1, path2 := []int{}, []int{}
+	nodePathBST(root, x, &path1)
+	nodePathBST(root, y, &path2)
+	lca := intLca(path1, path2)
+	// skip until lca found
+	var i, j int
+	for i = 0; path1[i] != lca; i++ {
+	}
+	for j = 0; path2[j] != lca; j++ {
+	}
+	path1 = path1[i:]
+	path2 = path2[j:]
+
+	reverse(&path1)
+	for i := 1; i < len(path2); i++ {
+		path1 = append(path1, path2[i])
+	}
+	return path1
+}
+
+func reverse(path *[]int) {
+	for start, end := 0, len(*path)-1; start < end; start, end = start+1, end-1 {
+		(*path)[start], (*path)[end] = (*path)[end], (*path)[start]
+	}
+
+}
+func intLca(p, q []int) int {
+	lca := -1
+	for i, j := 0, 0; i < len(p) && j < len(q); i, j = i+1, j+1 {
+		if p[i] != q[j] {
+			break
+		}
+		lca = p[i]
+	}
+	return lca
+}
+
+func nodePathBST(root *node, x int, path *[]int) {
+	if root == nil {
+		return
+	}
+	*path = append(*path, root.value)
+	if root.value == x {
+		return
+	}
+	if root.value > x {
+		nodePathBST(root.left, x, path)
+	} else {
+		nodePathBST(root.right, x, path)
+	}
+}
+
+//     4
+//    /   \
+//   2     7
+//  / \   / \
+// 1   3 6   9
+
+func TestPathBetweenNodesBST() {
+	root := makeTestTree()
+	cases := []struct {
+		in   *node
+		x, y int
+		out  []int
+	}{
+		{root, 1, 3, []int{1, 2, 3}},
+		{root, 2, 3, []int{2, 3}},
+		{root, 1, 9, []int{1, 2, 4, 7, 9}},
+		{root, 7, 6, []int{7, 6}},
+	}
+	fmt.Println("path between two nodes BST:", printLevel(root))
+	for _, c := range cases {
+		fmt.Println("x:", c.x, "y:", c.y, "expected:", c.out, "got:", pathBetweenNodesBST(c.in, c.x, c.y))
+	}
+
+}
+
+//find distance for each level using tree traversal. O(n)
+// since root to lca path will be accounted twice in that distance
+// remove 2*lcadistance from total distance.
+func distanceTwoNodeBinary(root *node, x, y int) int {
+	xDist := distance(root, 0, x)
+	yDist := distance(root, 0, y)
+
+	lca := lcaBinary(root, x, y)
+	lcaDist := distance(root, 0, lca.value)
+
+	return (xDist + yDist) - (2 * lcaDist)
+}
+
+func distance(root *node, level, x int) int {
+	if root == nil {
+		return -1
+	}
+
+	if root.value == x {
+		return level
+	}
+	if leftDist := distance(root.left, level+1, x); leftDist != -1 {
+		return leftDist
+	}
+	return distance(root.right, level+1, x)
+}
+
+//     4
+//    /   \
+//   2     7
+//  / \   / \
+// 1   3 6   9
+
+func TestDistanceTwoNodeBinary() {
+	root := makeTestTree()
+	cases := []struct {
+		in        *node
+		x, y, out int
+	}{
+		{root, 1, 3, 2},
+		{root, 2, 3, 1},
+		{root, 1, 9, 4},
+		{root, 7, 6, 1},
+	}
+	fmt.Println("Distance between two nodes in binary tree:", printLevel(root))
+
+	for _, c := range cases {
+		fmt.Println("x:", c.x, "y:", c.y, "expected:", c.out, "got:", distanceTwoNodeBinary(c.in, c.x, c.y))
+	}
+
+}
+
+// find maximum root to leaf path sum
+func maxRootToLeafPathSum(root *node) int {
+	if root == nil {
+		return 0
+	}
+	maxSum := 0
+	maxRToLSum(root, 0, &maxSum)
+	return maxSum
+}
+
+func maxRToLSum(root *node, curr int, maxSum *int) {
+	if root.left == nil && root.right == nil {
+		*maxSum = max(*maxSum, curr+root.value)
+		return
+	}
+
+	curr += root.value
+	maxRToLSum(root.left, curr, maxSum)
+	maxRToLSum(root.right, curr, maxSum)
+
+}
+
+//     4
+//    /   \
+//   2     7
+//  / \   / \
+// 1   3 6   9
+
+func TestMaxRootToLeafPathSum() {
+	root := makeTestTree()
+	fmt.Println("Max sum root to leaf:", printLevel(root), "expected:20 got:", maxRootToLeafPathSum(root))
+}
+
+// maximum sum between two leaf nodes in binary tree
+// find lsum, rsum, add root.value. compare it with max, if greater then update max
+// return maxof lsum or rsum + root.value for uppper level node.
+func maxSumAnyTwoLeafsBinary(root *node) int {
+	if root == nil {
+		return 0
+	}
+	maxSum := 0
+	maxLeafSum(root, &maxSum)
+	return maxSum
+}
+
+func maxLeafSum(root *node, maxSum *int) int {
+	if root == nil {
+		return 0
+	}
+	leftSum := maxLeafSum(root.left, maxSum)
+	rightSum := maxLeafSum(root.right, maxSum)
+
+	if leftSum == 0 {
+		return root.value + rightSum
+	}
+
+	if rightSum == 0 {
+		return root.value + leftSum
+	}
+
+	// check if current path going through root has max sum.
+	*maxSum = max(*maxSum, root.value+leftSum+rightSum)
+	// return max leaf path sum from root to either left or right
+	return max(leftSum, rightSum) + root.value
+}
+
+//     4
+//    /   \
+//   2     7
+//  / \   / \
+// 1   3 6   9
+
+//it should be  3 + 2 + 4+ 7 +9=25
+
+func TestMaxSumAnyTwoLeafsBinary() {
+	root := makeTestTree()
+	fmt.Println("Max sum two leaves binary:", printLevel(root), "expected:25 got:", maxSumAnyTwoLeafsBinary(root))
+}
+
+// if right child is not null then its loweset value in right subtree
+// if right child is null then it would be one of its parent
+// inorder traversal visits left node before root node then right node. root node being parent.
+// so in inorder travrsal if we go left then mark current node as root and proceed until node is found.
+func inOrderSucc(root, x, succ *node) *node {
+	if root == nil {
+		return succ
+	}
+	// lowest node in right subtree
+	if x.right != nil {
+		succ := x.right
+		for succ.left != nil {
+			succ = succ.left
+		}
+		return succ
+	}
+	// right subtree is nil so one of its parent is succ.
+	// if the node is in right subtree then
+	if root.value > x.value {
+		succ = inOrderSucc(root.left, x, root)
+	} else if root.value < x.value {
+		succ = inOrderSucc(root.right, x, succ)
+	}
+	// node found. send last assigned succ
+	return succ
+}
+
+func inOrderSuccItr(root, x *node) *node {
+	if root == nil {
+		return nil
+	}
+	// lowest node in right subtree
+	if x.right != nil {
+		succ := x.right
+		for succ.left != nil {
+			succ = succ.left
+		}
+		return succ
+	}
+	var succ *node
+	for root != nil {
+		if root.value > x.value {
+			succ = root
+			root = root.left
+		} else if root.value < x.value {
+			root = root.right
+		} else {
+			break
+		}
+	}
+	return succ
+}
+
+//     4
+//    /   \
+//   2     7
+//  / \   / \
+// 1   3 6   9
+func TestInorderSuccRecurr() {
+	root := makeTestTree()
+	cases := []struct {
+		in  *node
+		x   *node
+		out interface{}
+	}{
+		{root, root, 6},
+		{root, root.left.right, 4},
+		{root, root.right.right, nil},
+		{root, root.left, 3},
+		{root, root.right, 9},
+	}
+	fmt.Println("Inorder successor of ", printLevel(root))
+	for _, c := range cases {
+		fmt.Println("(Recursive) Successor of ", c.x, "expected:", c.out, "got:", inOrderSucc(c.in, c.x, nil))
+	}
+
+	for _, c := range cases {
+		fmt.Println("(Iterative) Successor of ", c.x, "expected:", c.out, "got:", inOrderSuccItr(c.in, c.x))
+	}
+}
+
+type pnode struct {
+	value               int
+	left, right, parent *pnode
+}
+
+//inorder successor with parent pointer.
+// if right node is not null then lowest node in right subtree.
+// Inorder traversal does left,root, right.
+// that means when a node is visited, is in left subtree of root then its succ is its parent.
+// if right subtree then its parent will be last unvisited parent.
+// so last unvisited parent would be the node whose left child was last visited in in order traversal.
+// that means travel upword until you find a a node whose left child is current node
+func inOrdersuccParent(root, x *pnode) *pnode {
+	if root == nil {
+		return nil
+	}
+	// lowest node in right subtree
+	if x.right != nil {
+		succ := x.right
+		for succ.left != nil {
+			succ = succ.left
+		}
+		return succ
+	}
+	parent := x.parent
+	for parent != nil && parent.left != x {
+		x = parent
+		parent = x.parent
+	}
+	return parent
+}
+
+// validate if a tree is BST or not.
+func validateBST(root *node) bool {
+	if root == nil {
+		return true
+	}
+	return validateBSTUtil(root, -1<<31, 1>>31-1)
+}
+
+func validateBSTUtil(root *node, min, max int) bool {
+	if root == nil {
+		return true
+	}
+	// fucked up here. I had && here. root should be either more than min or less then max
+	if root.value < min || root.value > max {
+		return false
+	}
+	left := validateBSTUtil(root.left, min, root.value-1)
+	right := validateBSTUtil(root.right, root.value+1, max)
+	return left && right
+}
+
+var prev *node
+
+func validateBSTInOrder(root *node) bool {
+	if root == nil {
+		return true
+	}
+	if !validateBSTInOrder(root.left) {
+		return false
+	}
+	if prev != nil && prev.value > root.value {
+		return false
+	}
+	prev = root
+	return validateBSTInOrder(root.right)
+}
+
+//     4
+//    /   \
+//   2     7
+//  / \   / \
+// 1   3 6   9
+
+//     4
+//    /   \
+//   2     5
+//  / \   / \
+// 1   3 6   9
+
+func TestValidateBST() {
+	root := makeTestTree()
+	fmt.Println("validate BST of: ", printLevel(root), "expected: true got:", validateBST(root))
+	root.right.value = 5
+	fmt.Println("validate BST of: ", printLevel(root), "expected: false got:", validateBST(root))
+
+	root = makeTestTree()
+	fmt.Println("validate BST (inorder) of: ", printLevel(root), "expected: true got:", validateBSTInOrder(root))
+	root.right.value = 5
+	fmt.Println("validate BST(inorder) of: ", printLevel(root), "expected: false got:", validateBSTInOrder(root))
+}
+
 func main() {
 	TestLevelOrder()
 	//TestPrintLevel()
@@ -1034,5 +1438,16 @@ func main() {
 	TestSumOfRoottoLeafPaths()
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 	TestDeleteBST()
-
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	TestPathBetweenNodesBST()
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	TestDistanceTwoNodeBinary()
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	TestMaxRootToLeafPathSum()
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	TestMaxSumAnyTwoLeafsBinary()
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	TestInorderSuccRecurr()
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	TestValidateBST()
 }

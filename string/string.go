@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"strings"
 )
 
 // Given a non-empty string check if it can be constructed by taking a substring of it and appending multiple copies of the substring together. You may assume the given string consists of lowercase English letters only and its length will not exceed 10000.
@@ -105,7 +106,156 @@ func TestRepeatedSubString() {
 	}
 }
 
+func ransomNote(ransom, dict []byte) bool {
+	charMap := make(map[byte]int)
+	for _, b := range dict {
+		charMap[b] = charMap[b] + 1
+	}
+
+	for _, r := range ransom {
+		charMap[r] = charMap[r] - 1
+		if charMap[r] < 0 {
+			return false
+		}
+	}
+	return true
+}
+
+// longest prefix in the array of strings.
+func longestPrefix(s []string) string {
+	if len(s) == 0 {
+		return ""
+	}
+	pre := s[0]
+	for i := 1; i < len(s); i++ {
+		pre = prefix(pre, s[i])
+		if pre == "" {
+			return ""
+		}
+	}
+	return pre
+}
+
+func prefix(first, second string) string {
+	sb := bytes.Buffer{}
+	for f, s := 0, 0; f < len(first) && s < len(second); f, s = f+1, s+1 {
+		if first[f] != second[s] {
+			break
+		}
+		sb.WriteString(string(first[f]))
+	}
+	return sb.String()
+}
+
+// case: {"foo", "foobar", "f"}, we have to scan all the string to find "f"
+// think of it as a two dimention array.
+// get first char of all the string and compare with first char of base string.
+func longestPrefixOptimized(strs []string) string {
+	if len(strs) == 0 {
+		return ""
+	}
+	min := (1 << 31) - 1
+	for _, s := range strs {
+		if l := len(s); l < min {
+			min = l
+		}
+	}
+	sb := bytes.Buffer{}
+	for i := 0; i < min; i++ {
+		curr := strs[0][i]
+		for j := 1; j < len(strs); j++ {
+			if strs[j][i] != curr {
+				return sb.String()
+			}
+		}
+		sb.WriteByte(curr)
+	}
+	return sb.String()
+}
+
+//TODO
+// func longestPrefixTrie(strs []string) string{
+
+// }
+
+func TestLongestPrefix() {
+	cases := []struct {
+		in  []string
+		out string
+	}{
+		{[]string{"foo", "bar"}, ""},
+		{[]string{"foo", "foobar", "f"}, "f"},
+		{[]string{"foo", "foobar", "fooz"}, "foo"},
+	}
+	for _, c := range cases {
+		fmt.Println("Longest Prefix of ", c.in, "expected:", c.out, "got:", longestPrefix(c.in))
+	}
+
+	for _, c := range cases {
+		fmt.Println("Optimized Longest Prefix of ", c.in, "expected:", c.out, "got:", longestPrefixOptimized(c.in))
+	}
+}
+
+func validateIP(s string) bool {
+	if len(s) == 0 {
+		return false
+	}
+	tokens := strings.Split(s, ".")
+	if len(tokens) != 4 {
+		return false
+	}
+
+	for _, t := range tokens {
+		if !isValidSubnet(t) {
+			return false
+		}
+	}
+	return true
+}
+
+func isValidSubnet(s string) bool {
+	if len(s) == 0 || len(s) > 3 {
+		return false
+	}
+	if s[0] == '0' && len(s) != 1 {
+		return false
+	}
+	num := 0
+	for _, r := range s {
+		if r >= '0' && r <= '9' {
+			num = (num * 10) + (int(r) - '0')
+			continue
+		}
+		return false
+	}
+	if num > 255 {
+		return false
+	}
+	return true
+}
+
+func TestValidIP() {
+	cases := []struct {
+		in  string
+		out bool
+	}{
+		{"0.1.2.3", false},
+		{"192.168.0.1", true},
+		{"255.255.255.255", true},
+		{"256.256.256.256", false},
+		{"2.3", false},
+	}
+
+	for _, c := range cases {
+		fmt.Println("Validate IP:", c.in, "expected:", c.out, "got:", validateIP(c.in))
+	}
+}
+
 func main() {
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 	TestRepeatedSubString()
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	TestLongestPrefix()
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+	TestValidIP()
 }
