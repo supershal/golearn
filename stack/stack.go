@@ -72,56 +72,12 @@ func TestSortedStack() {
 	fmt.Println("sorted:", printStack(result))
 }
 
-type QStack struct {
-	primary, secondary []int
-}
-
-func newQStack(capacity int) *QStack {
-	return &QStack{
-		primary:   make([]int, 0, capacity),
-		secondary: make([]int, 0, capacity),
-	}
-}
-
-func (s *QStack) pop() int {
-	if len(s.primary) == 0 {
-		fmt.Println("Stack empty")
-		return -1
-	}
-	val := s.primary[0]
-	s.primary = s.primary[1:]
-	return val
-}
-
-func (s *QStack) push(x int) {
-	if len(s.secondary) == cap(s.secondary) {
-		fmt.Println("stack overflow")
-		return
-	}
-	s.secondary = append(s.secondary, x)
-	for len(s.primary) != 0 {
-		s.secondary = append(s.secondary, s.primary[0])
-		s.primary = s.primary[1:]
-	}
-	s.primary, s.secondary = s.secondary, s.primary
-}
-
-func TestQstack() {
-	stack := newQStack(5)
-	stack.push(1)
-	stack.push(2)
-	fmt.Println("expected pop: 2, got:", stack.pop())
-	fmt.Println("expected pop: 1, got:", stack.pop())
-	fmt.Println("expected pop: -1, got:", stack.pop())
-
-}
-
 func main() {
 	tests := map[string]func(){
 		"mergeTwoStack":    TestTwoStacks,
 		"queueUsingStacks": TestQueueUsingStacks,
+		"nstack":           TestNStack,
 	}
-	//TestQstack()
 	//TestSortedStack()
 	//TestTwoStacks()
 	filename := os.Args[1]
