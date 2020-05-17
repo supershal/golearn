@@ -343,7 +343,7 @@ func rootToLeafPath(root *node, currPath string, paths *[]string) {
 	if root == nil {
 		return
 	}
-	if root.left == nil || root.right == nil {
+	if root.left == nil && root.right == nil {
 		*paths = append(*paths, currPath+strconv.Itoa(root.value))
 	}
 	currPath += strconv.Itoa(root.value) + "->"

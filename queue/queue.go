@@ -54,11 +54,21 @@ func (q *queue) isEmpty() bool {
 	return q.first == nil && q.last == nil
 }
 
+type stackQueue struct {
+	primary, secondary []int
+}
+
+type stack []int
+
+func (s *stack) push(x int) {
+	*s = append(*s, x)
+}
+func (s *stack) pop() int {
+	top := (*s)[len(*s)-1]
+	*s = (*s)[:len(*s)-1]
+	return top
+}
+
 func main() {
-	q := &queue{}
-	q.enqueue(1)
-	q.enqueue(2)
-	q.enqueue(3)
-	q.dequeue()
-	print(q.first)
+
 }

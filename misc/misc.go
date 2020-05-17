@@ -235,7 +235,7 @@ func TestnestedWeightedSum() {
 	}
 }
 
-// find middle element in rotated array
+// find minimum element in rotated array
 func findMinRotated(arr []int, low, high int) int {
 	if len(arr) == 0 {
 		return -1

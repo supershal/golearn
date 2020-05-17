@@ -41,9 +41,9 @@ func copyUsingMap(head *cnode) *cnode {
 	}
 	cache := make(map[int]*cnode, 0)
 	current := head
-	copy := newCNode(current.value, nil, nil)
-	cache[current.value] = copy
-	prev := copy
+	clone := newCNode(current.value, nil, nil)
+	cache[current.value] = clone
+	prev := clone
 	for current != nil {
 		current = current.next
 		if current == nil {
@@ -56,14 +56,14 @@ func copyUsingMap(head *cnode) *cnode {
 	}
 
 	current = head
-	cc := copy
+	cc := clone
 	for current != nil && cc != nil {
 		cc.random = cache[current.random.value]
 		current = current.next
 		cc = cc.next
 	}
 
-	return copy
+	return clone
 
 }
 
@@ -88,7 +88,7 @@ func copyList(head *cnode) *cnode {
 	}
 
 	current = head
-	copy := current.next
+	clone := current.next
 
 	for current != nil {
 		rest := current.next
@@ -98,7 +98,7 @@ func copyList(head *cnode) *cnode {
 		current = rest
 	}
 
-	return copy
+	return clone
 
 }
 
