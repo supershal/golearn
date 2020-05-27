@@ -1,5 +1,7 @@
 package main
 
+import "os"
+
 type children []int
 
 type graph struct {
@@ -56,5 +58,12 @@ func (g *graph) bfs(x int) {
 }
 
 func main() {
-
+	tests := map[string]func(){
+		"shortestPath": TestShortestPath,
+	}
+	//TestSortedStack()
+	//TestTwoStacks()
+	filename := os.Args[1]
+	testFunc, _ := tests[filename]
+	testFunc()
 }
