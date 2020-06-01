@@ -42,9 +42,9 @@ https://golang.org/pkg/container/heap/
 
 
 ## Strategies
-- The element is always popped and pushed from end of the slice.
-- for minHip smallest at 0th index and largest at nth index. so whenever a asked to keep the fixed sized queue, pop element first if size == n then push element.
-- same goes for maxheap. the element that removed from nth index is the smallest one. 
+- The element is always popped and pushed from end of the slice when implementing the interface. actual package Pop method will remove element from 0th index.
+- for minHip smallest at 0th index. so whenever a asked to keep the fixed sized queue, first push element which will call heapify and then pop element 
+- same goes for maxheap. 
 - when asked about Kth largest, use maxheap. use Less function in reverse (h[i]>h[j])
 - when asked about kth smallest, use minHeap. 
 
