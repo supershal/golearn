@@ -24,7 +24,24 @@
 
 # things to look for
 
-
+--> collect nodes at levels
+-> use variation of this to collect left nodes, right nodes or nodes at same level
+```go
+func collect(n *Node, level int, list *[][]*Node) {
+    if n == nil {
+        return
+    }
+    
+    for len(*list) < level+1 {
+        (*list) = append((*list), []*Node{})
+    }
+    
+    (*list)[level] = append((*list)[level], n)
+    
+    collect(n.Left, level+1, list)
+    collect(n.Right, level+1, list)
+}
+```
 # important problems
 - Right, left, zigzag, bottom-up, vertical view of the tree
  - right, left view
