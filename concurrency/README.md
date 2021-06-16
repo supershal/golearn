@@ -69,6 +69,83 @@ When a goroutine attempts to send a resource to a buffered channel and the chann
 
  if the buffer is full or if there is nothing to receive, a buffered channel will behave very much like an unbuffered channel.
 
+*create channel*
+append `chan` before type. `ch := make(chan int)`. This is bidirectional channel.
+to send value to the channel `ch <- val` 
+to recive value from channel `val := <-ch`
+
+**bhehvior of channel**
+https://www.ardanlabs.com/blog/2017/10/the-behavior-of-channels.html
+when it comes to channels, I think about one thing: signaling. A channel allows one goroutine to signal another goroutine about a particular event. Signaling is at the core of everything you should be doing with channels. Thinking of channels as a signaling mechanism will allow you to write better code with well defined and more precise behavior.
+
+To understand how signaling works, we must understand its three attributes:
+- Guarantee Of Delivery
+- State
+- With or Without Data
+
+*Gaurantee of Delivery*:
+unbuffered channel gaaurantees deliver. buffered does not
+
+*State*
+The state of the channel can be nil, open or closed.
+
+var ch chan string // nil state
+ch := make(chan string) // its in open state
+
+close(ch) // closed state
+
+**Signals are sent and received through a channel. Don’t say read/write because channels don’t perform I/O.**
+
+`send` on closed channel causes `panic` .  data can be still received on closed channel.
+
+*with or without data*
+When you signal with data, it’s usually because:
+
+  - A goroutine is being asked to start a new task.
+  - A goroutine reports back a result.
+
+You signal without data by closing a channel.
+When you signal without data, it’s usually because:
+
+  - A goroutine is being told to stop what they are doing.
+  - A goroutine reports back they are done with no result.
+  - A goroutine reports that it has completed processing and shut down.
+
+*Signaling Without Data*
+Signaling without data is mainly reserved for cancellation. It allows one goroutine to signal another goroutine to cancel what they are doing and move on
+In most cases you want to use the standard library context package to implement signaling without data. The context package uses an Unbuffered channel underneath for the signaling and the built-in function close to signal without data.
+
+If you choose to use your own channel for cancellation, rather than the context package, your channel should be of type chan struct{}. It is the zero-space, idiomatic way to indicate a channel used only for signalling.
+
+** Iterate over channel **
+```go
+ch := make(chan int, 5)
+go func(){
+  for _, p := range ch {
+    fmt.Println("receinved", p)
+  }
+}
+
+const work = 20
+for w:=0; w < work; w++{
+  select{
+    case ch <- "paper":
+      fmt.Println("manager send work")
+    default:
+    //If you can’t perform the send, then you know your box is full and the employee is at capacity. At this point the new work needs to be discarded so things can keep moving.
+     fmt.Println("manager: drop")
+  }
+}
+close(ch
+
+```
+
+
+
+
+ 
+
+
 
 
 
